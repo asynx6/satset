@@ -1,0 +1,17 @@
+{
+  "name": "satset",
+  "version": "0.1.0",
+  "description": "Kirim link repo GitHub → dapat README Bahasa Indonesia lengkap. AI docs generator, zero dependency.",
+  "main": "satset.js",
+  "type": "module",
+  "bin": { "satset": "satset.js" },
+  "scripts": {
+    "start": "node satset.js serve",
+    "test": "node test.js"
+  },
+  "keywords": ["readme", "documentation", "ai", "github", "indonesia", "codegen", "self-hosted"],
+  "repository": { "type": "git", "url": "git+https://github.com/asynx6/satset.git" },
+  "author": "asynx6",
+  "license": "MIT",
+  "engines": { "node": ">=18" }
+}

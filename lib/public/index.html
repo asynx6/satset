@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SatSet — repo → README</title>
+<style>
+:root{--bg:#0f172a;--card:#1e293b;--line:#334155;--tx:#f1f5f9;--mu:#94a3b8;--ac:#34d399}
+*{box-sizing:border-box;margin:0}
+body{font-family:system-ui,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:6vh 16px}
+h1{font-size:1.6rem;letter-spacing:-.02em}h1 b{color:var(--ac)}
+p.lead{color:var(--mu);margin:8px 0 26px;text-align:center;max-width:52ch;line-height:1.6}
+form{display:flex;gap:8px;width:100%;max-width:560px}
+input{flex:1;background:var(--card);border:1px solid var(--line);color:var(--tx);padding:13px 14px;border-radius:10px;font-size:1rem}
+input:focus{outline:2px solid var(--ac);border-color:var(--ac)}
+button{background:#15803d;border:0;color:#fff;padding:0 20px;border-radius:10px;font-size:.95rem;cursor:pointer}
+button:hover{background:#166534}button:disabled{opacity:.55;cursor:wait}
+#status{margin-top:14px;color:var(--mu);font-size:.9rem;min-height:1.4em}
+#meta{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+#meta span{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:.8rem;color:var(--mu)}
+#out{width:100%;max-width:860px;margin-top:22px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;display:none;overflow:auto;max-height:70vh}
+#out pre{white-space:pre-wrap;font-size:.85rem;line-height:1.55;font-family:ui-monospace,Consolas,monospace}
+.bar{display:flex;gap:8px;margin-bottom:14px}
+.bar a{color:var(--ac);font-size:.85rem;text-decoration:none;border:1px solid var(--line);padding:6px 12px;border-radius:8px}
+@media(max-width:560px){form{flex-direction:column}button{padding:12px}}
+</style>
+</head>
+<body>
+<h1>📚 <b>SatSet</b></h1>
+<p class="lead">Tempel link repo GitHub, tunggu sebentar, baca README-nya dalam Bahasa Indonesia — dibuat dari kode aslinya, bukan karangan.</p>
+
+<form id="f">
+  <input id="q" type="text" placeholder="owner/repo atau https://github.com/…" autocomplete="off" spellcheck="false" aria-label="Nama atau URL repo" required>
+  <button id="go" type="submit">Buatkan</button>
+</form>
+<div id="status" role="status" aria-live="polite"></div>
+<div id="meta"></div>
+
+<div id="out">
+  <div class="bar"><a id="dl" href="#" download="README.md">⬇ Download README.md</a></div>
+  <pre id="md"></pre>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+$('f').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const raw = $('q').value.trim();
+  const m = raw.match(/^(?:https?:\/\/(?:www\.)?github\.com\/)?([\w.-]+\/[\w.-]+?)(?:\.git)?\/?$/) || raw.match(/git@github\.com:([\w.-]+\/[\w.-]+?)\.git$/);
+  if (!m) { $('status').textContent = 'Formatnya owner/nama-repo atau link GitHub.'; return; }
+  const repo = m[1];
+  $('go').disabled = true;
+  $('status').textContent = '⏳ Scan repo & generate README — biasanya 1-5 menit, jangan ditutup…';
+  $('meta').innerHTML = '';
+  $('out').style.display = 'none';
+  try {
+    const r = await fetch('/generate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ repo }) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'HTTP ' + r.status);
+    $('status').textContent = '✔ Selesai.';
+    $('meta').innerHTML = `<span>🏷 ${d.category || '-'}</span><span>${(d.tagline || '').replace(/</g,'&lt;')}</span>`;
+    $('md').textContent = d.readme;
+    $('dl').href = URL.createObjectURL(new Blob([d.readme], { type: 'text/markdown' }));
+    $('dl').download = 'README-' + repo.replace('/', '__') + '.md';
+    $('out').style.display = 'block';
+  } catch (err) {
+    $('status').textContent = '✖ ' + err.message;
+  } finally {
+    $('go').disabled = false;
+  }
+});
+</script>
+</body>
+</html>

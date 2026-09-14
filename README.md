@@ -15,11 +15,21 @@ cp .env.example .env   # isi LLM_API_KEY + GH_TOKEN (PAT scope repo)
 
 node satset.js asynx6/nama-repo                    # README ke stdout
 node satset.js <repo> --write README.baru.md       # simpan ke file
-node satset.js <repo> --pr                         # buka PR docs
-node satset.js serve                               # API: POST /generate {repo}
+node satset.js <repo> --pr                         # langsung buka PR docs!
+node satset.js <repo> --changelog                  # CHANGELOG.md dari commit
+node satset.js <repo> --bilingual                  # README ID + EN satu file
+node satset.js <repo> --docs [dir]                 # README + docs/*.md terpecah
+node satset.js serve                               # web UI + API (port 3300)
 ```
 
 URL GitHub juga diterima: `node satset.js https://github.com/asynx6/satset`
+
+`serve` membuka dua hal: web UI one-box di `http://localhost:3300/` dan API
+`POST /generate` untuk otomasi. Flag `--docs --pr` digabung akan membuka satu PR
+berisi README + seluruh halaman docs-nya (teruji: PR 14 file sekaligus).
+
+Kredensial boleh PAT (`GH_TOKEN`) atau, kalau mau jalan sebagai bot sendiri,
+GitHub App — panduannya di [docs/github-app.md](docs/github-app.md).
 
 ## Perilaku yang dijamin
 
@@ -60,10 +70,13 @@ link repo → GitHub API tree (1 request) → pilih file berbobot
 
 ## Roadmap
 
-- Web UI one-box (tempel link, baca hasilnya di browser)
-- Generate docs/ multipage + CHANGELOG dari commit history
-- Mode bilingual (ID + EN dalam satu README)
-- GitHub App
+- Generate docs/ multipage + CHANGELOG dari commit history → sudah (v0.2)
+- Web UI one-box → sudah (v0.2)
+- Mode bilingual (ID + EN dalam satu README) → sudah (v0.2)
+- GitHub App sebagai kredensial → sudah (v0.2)
+- Webhook App: install sekali, auto-docs tiap push
+- Batch: satu file daftar repo → generate semua
+- Dukungan GitLab
 
 ## Lisensi
 
